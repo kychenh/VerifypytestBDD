@@ -1,0 +1,5 @@
+runable
+to do : 
+- write function to 
+- [] automatically start video and start tracing in conftest file. 
+-[] automatically  attach the video at the last step after end one scenario. 
