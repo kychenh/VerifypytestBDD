@@ -8,3 +8,10 @@ Feature: test login function
         And user enter password in password textbox.
         And user hit the submit button of login form.
         Then user should login successfully. 
+
+    Scenario: login with invalid data
+        Given user have an invalid login user and valid password
+        When user enter into username textbox
+        And user enter password in password textbox
+        And user hit the submit button of login form. 
+        Then user see error message "invalid credential"
