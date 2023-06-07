@@ -3,3 +3,55 @@ to do :
 - write function to 
 - [] automatically start video and start tracing in conftest file. 
 -[] automatically  attach the video at the last step after end one scenario. 
+
+resource : 
+using pipenv : 
+	pipenv --python 3.10
+	pipenv install -r requirements.txt
+
+python package : 
+	pip install pytest-playwright
+	playwright install
+	pip install assertpy
+	pip install pytest-csv-params
+	pip install python-dotenv
+	pip install cerberus
+	pip install jsonpath-ng
+	pip install Appium-Python-Client
+	pip install numpy
+	pip install nltk
+	pip install faker
+	pip install pyperclip
+	pip install multipledispatch
+	pip install allure-pytest
+
+Note : 
+	install numpy to serve package 
+
+How to integate allure into pytest : 
+	https://qxf2.com/blog/allure-integration-with-pytest/
+
+cmd 
+	pytest --alluredir=allure-report/ <filename.py>
+	 
+	allure serve allure-report/  <filename.py>
+	pytest -v -m runthis <filename.py> --alluredir=allure-report/
+	pytest -v -m "not runthis" <filename.py> --alluredir=allure-report/
+	
+	***collect the type to see how many case is run by this command : 
+	pytest testcase --collect-only 
+
+	*** list all pytest makedirs
+	pytest --markers
+	pytest --fixtures
+	
+	pytest -v -m runthis testcases
+
+=========
+generate requirements file : 
+	pip3 freeze > requirements.txt  # Python3
+	pip freeze > requirements.txt  # Python2
+=======
+
+
+
