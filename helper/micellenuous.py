@@ -269,7 +269,7 @@ class csvfile():
     def __str__(self) -> str:
         return str(self._data)
 
-    def parse_csv_file(self):
+    def parse_csv_file(self) -> list[list] :
         """
         Parse a CSV-like file with a specific delimiter and return a list of lists.
         """
@@ -302,3 +302,6 @@ class csvfile():
         """
         column_index = self._data[0].index(column_name)
         return self._data[row_index][column_index]
+    
+    def get_datalist(self):
+        return self._data

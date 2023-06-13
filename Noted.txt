@@ -47,11 +47,16 @@ cmd
 	
 	pytest -v -m runthis testcases
 
+Debug : 
+	add -s when call pytest
+	example : pytest -s 
+	
 =========
 generate requirements file : 
 	pip3 freeze > requirements.txt  # Python3
 	pip freeze > requirements.txt  # Python2
 =======
-
+with argument --testcasefile , expected a csv file with two col, one is the case id need to run. 
+under the hood, the framework will find this case existing in the item.name
 
 
