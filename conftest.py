@@ -113,9 +113,10 @@ def pytest_collection_modifyitems(config, items):
     reg_exp = config.getoption("--filter")
     testcasefile = config.getoption("--testcasefile")
     colidx = {
-        "caseID":0,
-        "selected": 1
+        "caseID":"caseid",
+        "selected": "selected"
     } # column with value yes/no to detemine test case to run. 
+    header = []
 
     if csv_out:
         tests = []
@@ -148,18 +149,21 @@ def pytest_collection_modifyitems(config, items):
         testcases= micel.csvfile(testcasefile)
         print(testcases)
         print(f"After filter we have {tmp}")
+        header = testcases.get_datalist()[0]
+        header = [str.lower(x) for x in header] # lower the case of header to avoid header case sensitive before compare
+
         testcases = testcases.get_datalist()[1:] # eliminate header row
         print(testcases)
-        testcases = filter(lambda x: re.search("(yes|y)", x[colidx["selected"]], re.IGNORECASE), testcases)
+        testcases = filter(lambda x: re.search("(yes|y)", x[header.index(colidx["selected"])], re.IGNORECASE), testcases)
         testcases = [i for i in testcases]
         for item in tmp: 
             print(f"process item {item.name}")
             for case in testcases: 
                 
-                print(f"case  = {case[colidx['caseID']]}")
-                if re.search(f"{case[colidx['caseID']]}", item.name, re.IGNORECASE):
+                print(f"case  = {case[header.index(colidx['caseID'])]}")
+                if re.search(f"{case[header.index(colidx['caseID'])]}", item.name, re.IGNORECASE):
                     if not item in result : 
-                        print(f"found item startith {case[colidx['caseID']]}")
+                        print(f"found item startith {case[header.index(colidx['caseID'])]}")
                         result.append(item)
                     # continue
 

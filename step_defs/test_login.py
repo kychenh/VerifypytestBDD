@@ -96,3 +96,4 @@ def step_function(page : Page, datatable, mytable):
     uname = parse_str_table(mytable)
     allure.attach(uname.columns.__str__())
     assert 1==1
+    
