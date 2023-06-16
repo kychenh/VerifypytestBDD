@@ -1,8 +1,16 @@
 runable
 to do : 
 - write function to 
-- [] automatically start video and start tracing in conftest file. 
--[] automatically  attach the video at the last step after end one scenario. 
+- [x] automatically start video and start tracing in conftest file. 
+-[x] automatically  attach the video at the last step after end one scenario. 
+-[x] add --filter arugemnet to filter the test case follow the regular expression. 
+-[x] add --testcasefle to force framework run the case mark yes in csv file. 
+-[] attach a excel file to scenario inside the BDD and use it to popular data to the test case. 
+-[] write the smart locator function to accept the string/ expression as lambda function/ if appium driver , then parse string to identify the locator type. 
+-[] a fixture to dispatch the driver type by the argument in the pytest argument command line. 
+-[] Update pass/fail into the excel file. 
+-[] Adding appium driver as fixture. 
+-[] adding capability json file to select device to test. 
 
 resource : 
 using pipenv : 
