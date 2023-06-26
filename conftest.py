@@ -91,7 +91,7 @@ def browser_context_args(browser_context_args, playwright):
     
     # iphone_11 = playwright.devices['iPhone 11 Pro']
         
-        
+    print("create browser contesxt _arg fixtures")
     record_video_dir = VIDEO_FOLDER
     if not os.path.exists(record_video_dir):
         os.makedirs(record_video_dir)
@@ -169,7 +169,9 @@ def pytest_collection_modifyitems(config, items):
                 if re.search(f"{case[header.index(colidx['caseID'])]}", item.name, re.IGNORECASE):
                     if not item in result : 
                         print(f"found item startith {case[header.index(colidx['caseID'])]}")
+                        
                         result.append(item)
+                        
                     # continue
 
     items[:] = result

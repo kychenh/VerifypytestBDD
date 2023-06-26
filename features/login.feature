@@ -14,7 +14,7 @@ Feature: test login function
         |username | password | Profiename | 
         | mona.lisa@lelouvre.fr |  mona@Davensi123| Mona Lisa |
 
-    
+    @login
     Scenario Outline: login with invalid username or invalid password
         Given user is on homepage
         When user enter into <username> textbox.
