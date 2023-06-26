@@ -1,7 +1,9 @@
 # conftest.py
 
 import pytest, allure, re
-from playwright.sync_api import (Page, BrowserContext)
+from playwright.sync_api import (Page, BrowserContext, sync_playwright)
+from playwright.async_api import async_playwright
+import asyncio
 from settings import *
 import helper.micellenuous as micel
 import csv 
@@ -79,15 +81,17 @@ def browser_type_launch_args(browser_type_launch_args):
     }
 
 @pytest.fixture(scope="session")
-def browser_context_args(browser_context_args):
+def browser_context_args(browser_context_args, playwright):
     """
     overwrite the fixture of playwright : browser_context_args
     and add some paramaters such as recorad video size, viewport.
     """
     # uncomment when added device OR use pytest.ini file with below argument
     # --device="iPhone 11 Pro"
-
+    
     # iphone_11 = playwright.devices['iPhone 11 Pro']
+        
+        
     record_video_dir = VIDEO_FOLDER
     if not os.path.exists(record_video_dir):
         os.makedirs(record_video_dir)
@@ -131,8 +135,9 @@ def pytest_collection_modifyitems(config, items):
                 print(item.name)
                 writer.writerow([item.name, item.location, item.parent, item.path, item.config] + item.user_properties )
     
-    result = []
-    if reg_exp: 
+    result = [item for item in items]
+    if reg_exp:
+        
         filtered_items = []
         for item in items:
             if re.match(reg_exp, item.name):

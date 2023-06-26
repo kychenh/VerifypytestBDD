@@ -2,6 +2,7 @@ Feature: test login function
     Background: user access homepage
     Given user land on homepage
     
+    @login
     Scenario Outline: login with valid data
         Given user is on homepage
         When user enter into <username> textbox.

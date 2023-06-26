@@ -6,11 +6,15 @@ import string
 import random
 import faker
 import csv
+import re
 from jsondiff import diff
 from typing import List, Tuple
 from dateutil.parser import parse
 from calendar import monthrange
 from screeninfo import get_monitors
+from appium.webdriver.webdriver import WebDriver
+from playwright.sync_api import Page
+
 
 ########################################################################################################
 # helper function
@@ -305,3 +309,84 @@ class csvfile():
     
     def get_datalist(self):
         return self._data
+    
+def smart_locator(locator, driver: Page|WebDriver):
+    """
+    This function takes two arguments: `locator` and `driver`. The `locator` argument can be either a string or a callable object. 
+    The `driver` argument can be either a Page object in the playwright package or the driver of the appium package.
+    If the `locator` argument is a string, it calls the `locator()` method of the `driver` object with the string as an argument. 
+    If the `locator` argument is a callable object, it executes the callable object with the input of the page object.
+    Before using any input arguments in your code, you should check them to ensure they are valid. If they are not valid, you should raise an exception.
+    """
+    if not isinstance(locator, str) and not callable(locator):
+        raise TypeError("The locator must be a string or a callable object.")
+    if not isinstance(driver, (Page, WebDriver)):
+        raise TypeError("The driver must be a Page object in the playwright package or the driver of the appium package.")
+    if isinstance(locator, str):
+        if isinstance(driver, Page):
+            return driver.locator(locator)
+        if isinstance(driver, WebDriver):
+            return api_findElement(driver=driver, locator= locator)
+    else:
+        if callable(locator):
+            return locator(driver)
+    
+
+def api_findElement(driver: WebDriver, selector: str):
+    """
+    Find element by selector using Appium driver.
+
+    Args:
+        driver (WebDriver): Appium driver object.
+        selector (str): Selector string specifying the element identification method.
+
+    Returns:
+        WebElement: Found element.
+
+    Raises:
+        ValueError: If the selector or driver is invalid.
+    """
+    matchfunc = {
+        "" : ""
+    }
+    if not isinstance(driver, WebDriver):
+        raise ValueError("Invalid driver")
+
+    if not isinstance(selector, str) or not selector.strip():
+        raise ValueError("Invalid selector")
+
+    selector = selector.strip()
+
+    # Pattern to identify the selector type
+    access_word = ["accessibility_id","access"]
+    pattern = r"^(id|name|class|xpath|accessibility_id|access):(.+)$"
+    match = re.match(pattern, selector)
+    
+    if not match:
+        raise ValueError("Invalid selector format")
+
+    selector_type = match.group(1).lower()
+    selector_value = match.group(2).strip()
+
+    
+    if selector_type == "id":
+        return driver.find_element_by_id(selector_value)
+    elif selector_type == "name":
+        return driver.find_element_by_name(selector_value)
+    elif selector_type == "class":
+        return driver.find_element_by_class_name(selector_value)
+    elif selector_type == "xpath":
+        return driver.find_element_by_xpath(selector_value)
+    elif selector_type in access_word:
+        return driver.find_element_by_accessibility_id(selector_value)
+    else:
+        raise ValueError("Unsupported selector type")
+
+def expand_string(reg_exp, func_name):
+    def expanded_string(string):
+        if re.match(reg_exp, string):
+            return globals()[func_name]
+        else:
+            raise ValueError(f"String does not match the regular expression: {reg_exp}")
+    
+    return expanded_string

@@ -6,12 +6,13 @@ from playwright.sync_api import Page, expect
 from assertpy import assert_that
 import functools
 from sttable import parse_str_table
+from helper.micellenuous import smart_locator
 
 temp = "../features/login.feature"
 baseURL = "https://davensi.dirox.dev"
 LOCATOR = {
     "LOGINFORM" : ".login-form",
-    "email" :"email", 
+    "email" : lambda p : p.locator(LOCATOR["LOGINFORM"]).get_by_placeholder("email"), 
     "password" : 'password',
     "usreprofile" : '.header-topbar .user-dropdown',
     "err_msg" : ".error"
@@ -35,7 +36,7 @@ def step_function1(page : Page):
 
 @when(parsers.re(r'user enter into (?P<username>.+) textbox(\.|)'))
 def step_function2(page : Page, username):
-    email = page.locator(LOCATOR["LOGINFORM"]).get_by_placeholder(LOCATOR["email"])    
+    email =    smart_locator(LOCATOR["email"], page)
     email.fill(username)
     # Add Your Code Here
     
