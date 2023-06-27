@@ -55,11 +55,18 @@ Debug :
 generate requirements file : 
 	pip3 freeze > requirements.txt  # Python3
 	pip freeze > requirements.txt  # Python2
-=======
-with argument --testcasefile , expected a csv file with at least two cols, one is the "caseid" need to run and the other is "selected". 
-the others col will be ignore. 
-not case sensitive. 
-the name "caseid", "selected" is reverse for only. DONT DUPLICATE THIS NAME. 
-under the hood, the framework will find this case existing in the item.name
+=========
+GIT 
+	Check the different when happening conflict. 
+
+	git diff --check
+=========
+built in argument : 
+
+--testcasefile , expected a csv file with at least two cols, one is the "caseid" need to run and the other is "selected". 
+	the others col will be ignore. 
+	not case sensitive. 
+	the name "caseid", "selected" is reverse for only. DONT DUPLICATE THIS NAME. 
+	under the hood, the framework will find this case existing in the item.name
 
 

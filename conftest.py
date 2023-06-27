@@ -8,12 +8,20 @@ from settings import *
 import helper.micellenuous as micel
 import csv 
 import pathlib, os
+from appium import webdriver
+
 
 # pytest hook to capture the screenshot after each step
 @pytest.hookimpl(tryfirst=True)
 def pytest_bdd_after_step(request, feature, scenario, step, step_func, step_func_args):
     # Get the current page from the step_func_args
-    if step_func_args['page'] : 
+    page = None
+    
+    # if 'idriver' in step_func_args : 
+    #     driver = step_func_args['idriver']
+    #     if isinstance(driver, Page) :
+    #         page = driver     
+    if 'page' in step_func_args : 
         page: Page = step_func_args['page']
     else : 
         page = None
@@ -32,16 +40,22 @@ def pytest_bdd_after_step(request, feature, scenario, step, step_func, step_func
 def pytest_bdd_before_scenario(request, feature, scenario):
     trace_name = TRACE_TMP_FILENAME
     context = request.getfixturevalue('context')
-    page = request.getfixturevalue('page')
+    # browser = request.getfixturevalue('browser')
+    # playwright = request.getfixturevalue('playwright')
+    # page = request.getfixturevalue('page')
+    # iphone_13 = playwright.devices['iPhone 13']
+    # browser = playwright.webkit.launch(headless=False)
+    # context = browser.new_context(
+    #     **iphone_13,
+    # )
     context.tracing.start(screenshots=True, snapshots=True)
 
-
-    
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_bdd_after_scenario(request, feature, scenario):
     context = request.getfixturevalue('context')
     page = request.getfixturevalue('page')
+    # page = request.getfixturevalue('idriver')
     context.tracing.stop(path=TRACE_TMP_FILENAME)
 
     trace_filepath = TRACE_TMP_FILENAME
@@ -54,11 +68,18 @@ def pytest_bdd_after_scenario(request, feature, scenario):
     
     # Attach the video to the allure report
     # allure.attach.video(path=VIDEO_FOLDER)
-    if page.is_closed()==False : page.close()
+    # if page.is_closed()==False : page.close()
     
     filename = f"videotmp_{micel.getTimestampStr() }"    
+    
+    try:
+        page.video.save_as("videos/"+ filename)    
+    except Exception:
+        print("[info]try close page before save as video!!") 
+        page.close()
+        # page = context.new_page()
+        page.video.save_as("videos/"+ filename)
 
-    page.video.save_as("videos/"+ filename)    
     print(f"video file path {page.video.path()}")    
 
     with open(page.video.path(), "rb") as video_file:         
@@ -91,7 +112,7 @@ def browser_context_args(browser_context_args, playwright):
     
     # iphone_11 = playwright.devices['iPhone 11 Pro']
         
-    print("create browser contesxt _arg fixtures")
+    print("create browser contesxt _arg fixtures is called")
     record_video_dir = VIDEO_FOLDER
     if not os.path.exists(record_video_dir):
         os.makedirs(record_video_dir)
@@ -175,3 +196,59 @@ def pytest_collection_modifyitems(config, items):
                     # continue
 
     items[:] = result
+
+
+# @pytest.fixture(scope="session")
+# def idriver (request, playwright):
+#     param = "web"
+#     driver = playwright.chromium.launch(headless=False).new_context().new_page()
+#     yield driver
+#     # driver.close()
+
+# class PlaywrightDriver:
+#     def __init__(self):
+#         self.browser: Page
+#         with sync_playwright() as playwright:
+#             self.browser = playwright.chromium.launch(headless=False).new_context().new_page()
+#         return self.browser
+
+# class AppiumDriver:
+#     def __init__(self):
+#         desired_caps = {
+#             "platformName": "Android",
+#             "platformVersion": "11",
+#             "deviceName": "emulator-5554",
+#             "appPackage": "com.android.calculator2",
+#             "appActivity": ".Calculator",
+#         }
+#         self.driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_caps)
+
+# class DriverFactory:
+#     def __init__(self, drivertype  : str = "web") -> None:
+#         self._driverType = drivertype
+
+#     @property
+#     def driverType(self):
+#         return self._driverType
+#     def driveType(self, drivetype : str):
+#         self._driverType = drivetype
+        
+#     def create_driver(self, driver_type: str):
+#         if driver_type == "web":
+#             return PlaywrightDriver()
+#         elif driver_type == "app":
+#             return AppiumDriver()
+#         else:
+#             raise ValueError(f"Invalid driver type: {driver_type}")
+        
+# @pytest.fixture(scope="session")
+# def context(playwright):
+#     context = playwright.chromium.launch(headless=False).new_context()
+#     yield context
+#     # context.close()
+
+# @pytest.fixture(scope="session")
+# def page(context):
+#     page = context.new_page()
+#     yield page
+#     # page.close()
