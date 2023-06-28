@@ -84,47 +84,50 @@ def pytest_bdd_after_scenario(request, feature, scenario):
 
     with open(page.video.path(), "rb") as video_file:         
         allure.attach(video_file.read(),name=f"recording video {filename}", attachment_type=allure.attachment_type.WEBM)
+    page.close()
+    context.close()
+    
     
     
 
-@pytest.fixture(scope="session")
-def browser_type_launch_args(browser_type_launch_args):
-    """
-    overwrite fixture "browser_type_launch_args" to maximize window when initilize browser.
+# @pytest.fixture(scope="session")
+# def browser_type_launch_args(browser_type_launch_args):
+#     """
+#     overwrite fixture "browser_type_launch_args" to maximize window when initilize browser.
 
-    """
-    # in playwright package, an completed function to overwrite fixture "browser_type_launch_args" to maximize window when initilize browser
-    return {
-        **browser_type_launch_args,
-        # 'devtools' : True,
-        "traces_dir": TRACE_FOLDER,        
-        "args": ["--start-maximized"],
-    }
+#     """
+#     # in playwright package, an completed function to overwrite fixture "browser_type_launch_args" to maximize window when initilize browser
+#     return {
+#         **browser_type_launch_args,
+#         # 'devtools' : True,
+#         "traces_dir": TRACE_FOLDER,        
+#         "args": ["--start-maximized"],
+#     }
 
-@pytest.fixture(scope="session")
-def browser_context_args(browser_context_args, playwright):
-    """
-    overwrite the fixture of playwright : browser_context_args
-    and add some paramaters such as recorad video size, viewport.
-    """
-    # uncomment when added device OR use pytest.ini file with below argument
-    # --device="iPhone 11 Pro"
+# @pytest.fixture(scope="session")
+# def browser_context_args(browser_context_args, playwright):
+#     """
+#     overwrite the fixture of playwright : browser_context_args
+#     and add some paramaters such as recorad video size, viewport.
+#     """
+#     # uncomment when added device OR use pytest.ini file with below argument
+#     # --device="iPhone 11 Pro"
     
-    # iphone_11 = playwright.devices['iPhone 11 Pro']
+#     # iphone_11 = playwright.devices['iPhone 11 Pro']
         
-    print("create browser contesxt _arg fixtures is called")
-    record_video_dir = VIDEO_FOLDER
-    if not os.path.exists(record_video_dir):
-        os.makedirs(record_video_dir)
+#     print("create browser contesxt _arg fixtures is called")
+#     record_video_dir = VIDEO_FOLDER
+#     if not os.path.exists(record_video_dir):
+#         os.makedirs(record_video_dir)
 
-    return {
-        **browser_context_args,
-        "record_video_size": {"width": screensize_width, "height": screensize_height},
-        "no_viewport": True,
-        "record_video_dir": record_video_dir,        
-        # "viewport": {"width": screensize_width, "height": screensize_height},
-        # **iphone_11    # added device size
-    }
+#     return {
+#         **browser_context_args,
+#         "record_video_size": {"width": screensize_width, "height": screensize_height},
+#         "no_viewport": True,
+#         "record_video_dir": record_video_dir,        
+#         # "viewport": {"width": screensize_width, "height": screensize_height},
+#         # **iphone_11    # added device size
+#     }
 
 def pytest_addoption(parser):
     parser.addoption("--output-tests-csv", action="store", default=None , help="out the execution intention test case to a csv file")
@@ -241,14 +244,17 @@ def pytest_collection_modifyitems(config, items):
 #         else:
 #             raise ValueError(f"Invalid driver type: {driver_type}")
         
-# @pytest.fixture(scope="session")
-# def context(playwright):
-#     context = playwright.chromium.launch(headless=False).new_context()
-#     yield context
-#     # context.close()
+@pytest.fixture()
+def context(playwright):
+    record_video_dir = VIDEO_FOLDER
+    context = playwright.chromium.launch().new_context(
+        record_video_dir=record_video_dir
+    )
+    yield context
+    # context.close()
 
-# @pytest.fixture(scope="session")
-# def page(context):
-#     page = context.new_page()
-#     yield page
-#     # page.close()
+@pytest.fixture()
+def page(context):
+    page = context.new_page()
+    yield page
+    # page.close()

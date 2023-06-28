@@ -1,3 +1,9 @@
+import allure
+import functools
+from pytest_bdd import when, given, then, parsers, parser
+from playwright.sync_api import Page, expect
+
+
 # def parse_str_table(table_with_headers):
 #     list_table_rows = table_with_headers.split("\n")
 #     list_headers = str(list_table_rows[0]).strip("|").split("|")
@@ -49,7 +55,7 @@ def data_table(name, fixture='data', orient='dict'):
     )
     data_table_parser = functools.partial(parse_data_table, orient=orient)
 
-    return parsers.cfparse(formatted_str, extra_types=dict(DataTable=data_table_parser))
+    return parser.cfparse(formatted_str, extra_types=dict(DataTable=data_table_parser))
 
 
 @when(data_table('user enter username textbox', fixture='username',  orient='columns'))
