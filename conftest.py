@@ -207,48 +207,12 @@ def pytest_collection_modifyitems(config, items):
 #     driver = playwright.chromium.launch(headless=False).new_context().new_page()
 #     yield driver
 #     # driver.close()
-
-# class PlaywrightDriver:
-#     def __init__(self):
-#         self.browser: Page
-#         with sync_playwright() as playwright:
-#             self.browser = playwright.chromium.launch(headless=False).new_context().new_page()
-#         return self.browser
-
-# class AppiumDriver:
-#     def __init__(self):
-#         desired_caps = {
-#             "platformName": "Android",
-#             "platformVersion": "11",
-#             "deviceName": "emulator-5554",
-#             "appPackage": "com.android.calculator2",
-#             "appActivity": ".Calculator",
-#         }
-#         self.driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_caps)
-
-# class DriverFactory:
-#     def __init__(self, drivertype  : str = "web") -> None:
-#         self._driverType = drivertype
-
-#     @property
-#     def driverType(self):
-#         return self._driverType
-#     def driveType(self, drivetype : str):
-#         self._driverType = drivetype
-        
-#     def create_driver(self, driver_type: str):
-#         if driver_type == "web":
-#             return PlaywrightDriver()
-#         elif driver_type == "app":
-#             return AppiumDriver()
-#         else:
-#             raise ValueError(f"Invalid driver type: {driver_type}")
         
 @pytest.fixture()
 def context(playwright):
-    record_video_dir = VIDEO_FOLDER
+    
     context = playwright.chromium.launch().new_context(
-        record_video_dir=record_video_dir
+        record_video_dir=VIDEO_FOLDER
     )
     yield context
     # context.close()
