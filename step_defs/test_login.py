@@ -9,7 +9,8 @@ from sttable import parse_str_table
 from helper.micellenuous import smart_locator
 
 temp = "../features/login.feature"
-baseURL = "https://davensi.dirox.dev"
+# baseURL = "https://davensi.dirox.dev"
+baseURL = "https://davensi.dirox.app"
 LOCATOR = {
     "LOGINFORM" : ".login-form",
     "email" : lambda p : p.locator(LOCATOR["LOGINFORM"]).get_by_placeholder("email"), 
@@ -52,6 +53,7 @@ def step_function3(page : Page , password):
 def step_function4(page : Page ):    
     page.get_by_role("button", name="Login", exact=True).click()
     
+    
 
 @then(parsers.re(r'user should login successfully(\.|)'))
 def step_function5(page : Page ):
@@ -65,8 +67,8 @@ def step_function5(page : Page ):
 def step_function(page : Page ):
     # Add Your Code Here
     # page.set_default_navigation_timeout = 100000
-    page.set_default_timeout = 10000
-    page.goto(baseURL, timeout=10000) 
+    page.set_default_timeout = 100000
+    page.goto(baseURL) 
 
 @given(parsers.re(r'user is on homepage(\.|)'))
 def step_f_user_is_on_homepage(page : Page):

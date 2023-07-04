@@ -32,20 +32,23 @@ def intercept_requestfinish(request):
     print("requested URL:", request.url)
     print(f"response body: {request.response().json()}")
 
-@allure.step("test with out feature file")
-def test_nofeaturefile(page : Page):   
-    # intercept any request, match any url pattern. 
-    page.on("request", incercept_request)
-    page.on("response", incercept_response) 
-    page.on("requestfinished", intercept_requestfinish)
+# @allure.step("test with out feature file")
+# def test_nofeaturefile(page : Page):   
+#     # intercept any request, match any url pattern. 
+#     page.on("request", incercept_request)
+#     page.on("response", incercept_response) 
+#     page.on("requestfinished", intercept_requestfinish)
 
-    # intercept the request specific by url = url pattern , ex: **/getuser. 
+#     # intercept the request specific by url = url pattern , ex: **/getuser. 
     
-    page.route(url=urlstring, handler= handle_route)
-    print('set route successfully!')
-    page.goto(url=urlstring, timeout=100000)
+#     page.route(url=urlstring, handler= handle_route)
+#     print('set route successfully!')
+#     page.goto(url=urlstring, timeout=100000)
    
-    print(f"iiid = {myjson}")
+#     print(f"iiid = {myjson}")
+
+def test_google(idriver): 
+    idriver.goto("http://www.google.com")   
+    print(idriver)
     
-   
     

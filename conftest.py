@@ -1,7 +1,9 @@
 # conftest.py
 
+import json
 import pytest, allure, re
 from playwright.sync_api import (Page, BrowserContext, sync_playwright)
+from playwright._impl._api_types import Error as pwError
 from playwright.async_api import async_playwright
 import asyncio
 from settings import *
@@ -9,6 +11,7 @@ import helper.micellenuous as micel
 import csv 
 import pathlib, os
 from appium import webdriver
+from helper.driver import DriverFactory, Driver
 
 
 # pytest hook to capture the screenshot after each step
@@ -72,15 +75,15 @@ def pytest_bdd_after_scenario(request, feature, scenario):
     
     filename = f"videotmp_{micel.getTimestampStr() }"    
     
+    
     try:
         page.video.save_as("videos/"+ filename)    
-    except Exception:
+    except pwError:
         print("[info]try close page before save as video!!") 
         page.close()
         # page = context.new_page()
         page.video.save_as("videos/"+ filename)
-
-    print(f"video file path {page.video.path()}")    
+    print(f"video file path {page.video.path()}")
 
     with open(page.video.path(), "rb") as video_file:         
         allure.attach(video_file.read(),name=f"recording video {filename}", attachment_type=allure.attachment_type.WEBM)
@@ -133,6 +136,7 @@ def pytest_addoption(parser):
     parser.addoption("--output-tests-csv", action="store", default=None , help="out the execution intention test case to a csv file")
     parser.addoption("--filter", action="store", default=None , help="filter out by provided regular expression")
     parser.addoption("--testcasefile", action="store",default=None , help="use this test case list to determine which case is run, \n csv file format with 2 col ( testcase name, yes/no)")
+    parser.addoption("--driver", action="store", default="web" , help="[web, app]")
 
 
 
@@ -157,6 +161,8 @@ def pytest_collection_modifyitems(config, items):
             writer = csv.writer(csvfile)
             for item in items:
                 print(item.name)
+                # item.fixturenames.append('my_param')
+                # item.add_marker(pytest.mark.parametrize('my_param', ['web']))  # add parameter to each test case. 
                 writer.writerow([item.name, item.location, item.parent, item.path, item.config] + item.user_properties )
     
     result = [item for item in items]
@@ -192,7 +198,7 @@ def pytest_collection_modifyitems(config, items):
                 print(f"case  = {case[header.index(colidx['caseID'])]}")
                 if re.search(f"{case[header.index(colidx['caseID'])]}", item.name, re.IGNORECASE):
                     if not item in result : 
-                        print(f"found item startith {case[header.index(colidx['caseID'])]}")
+                        print(f"found item startwith {case[header.index(colidx['caseID'])]}")
                         
                         result.append(item)
                         
@@ -200,25 +206,61 @@ def pytest_collection_modifyitems(config, items):
 
     items[:] = result
 
+@pytest.fixture(autouse=True)
+def config_data():
+    with open(CONFIGDATA) as f:
+        config = json.load(f)
+    return config
 
-# @pytest.fixture(scope="session")
-# def idriver (request, playwright):
-#     param = "web"
-#     driver = playwright.chromium.launch(headless=False).new_context().new_page()
-#     yield driver
-#     # driver.close()
+@pytest.fixture()
+def samplefixture():
+    
+    """
+    this sample fxiture is a placeholder for appium / or any driver in the future
+    """
+    print(f"this is sample fixture")
+    return "this is sample fixture"
+
+# @pytest.fixture(params=['appp'])
+@pytest.fixture()
+def idriver (request, page, samplefixture, pytestconfig): 
+    # print for debug purpose only. List out all possible fixtures. 
+    # print(f"-------------------REQUEST OBJECT IN iDRIVER--------------")
+    # for attr in dir(request):
+    #     print(f"{attr} = {getattr(request, attr)}")
+    
+    arg1 = pytestconfig.getoption("--driver")   
+    if arg1 == "web" : 
+        yield page
+    else : 
+        yield samplefixture
+    
+    # driver.close()
         
 @pytest.fixture()
-def context(playwright):
+def context(playwright, config_data):
     
-    context = playwright.chromium.launch().new_context(
-        record_video_dir=VIDEO_FOLDER
-    )
+    browser = playwright[config_data['browser']].launch(headless=False)
+    context = browser.new_context(**config_data['context_args'])
+
+    # context = playwright.chromium.launch(headless=False).new_context(
+    #     record_video_dir=VIDEO_FOLDER,
+        
+    # )
     yield context
     # context.close()
 
 @pytest.fixture()
 def page(context):
-    page = context.new_page()
+    page = context.new_page()    
     yield page
     # page.close()
+
+# @pytest.fixture()
+# def page(playwright):    
+#     tmp = DriverFactory().create_driver()
+#     tmp.pw = playwright
+#     page = tmp.create_driver()
+    
+#     yield page.browser
+#     # page.browser.close()

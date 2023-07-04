@@ -1,0 +1,8 @@
+{
+    "browser" : "firefox",
+    "context_args" : {
+        "record_video_dir" : "./videos"
+    }, 
+    "launch_args":"",
+    "page_args" : ""
+}

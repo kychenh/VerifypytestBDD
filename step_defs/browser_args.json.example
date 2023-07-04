@@ -1,0 +1,25 @@
+{
+  "browser": "chromium",
+  "launch_args": {
+    "headless": False,
+    "devtools": True
+  },
+  "context_args": {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "geolocation": {
+      "latitude": 37.7749,
+      "longitude": -122.4194
+    },
+    "record_video_dir": "/path/to/video/directory",
+    "traces_dir": "/path/to/traces/directory"
+  },
+  "page_args": {
+    "device_scale_factor": 2,
+    "hasTouch": True,
+    "javaScriptEnabled": False,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+  }
+}
