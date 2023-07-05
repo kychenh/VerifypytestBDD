@@ -1,12 +1,14 @@
 from collections import OrderedDict, namedtuple
 
 from datetime import datetime
+from decimal import Decimal
 import json, os
 import string
 import random
 import faker
 import csv
 import re
+import sys
 from jsondiff import diff
 from typing import List, Tuple
 from dateutil.parser import parse
@@ -390,3 +392,44 @@ def expand_string(reg_exp, func_name):
             raise ValueError(f"String does not match the regular expression: {reg_exp}")
     
     return expanded_string
+
+def convert_to_number(string):
+    """
+    convert3("1213324254354354354")
+    1213324254354354354
+    convert3("1213324254354354354.32443343")
+    Decimal('1213324254354354354.32443343')
+    convert3("12133242.54354354354")
+    Decimal('12133242.54354354354')
+    """
+    # Remove commas from the string
+    string = string.replace(',', '')
+
+    # Check if the length of the string exceeds the maximum integer value
+    if len(string) > len(str(sys.maxsize)):
+        # Use Decimal for large numbers
+        return Decimal(string)
+
+    # Extract the decimal part (if any) using regular expression
+    decimal_part = re.search(r'\.\d+', string)
+
+    if decimal_part:
+        # If a decimal part exists, replace the dot with an empty string
+        string = string.replace('.', '', 1)
+        return float(string[:decimal_part.start()] + '.' + string[decimal_part.start()+1:])
+
+    # No decimal part, convert to int
+    return int(string)
+
+def convert_json_value(json_obj):
+    for key, value in json_obj.items():
+        if isinstance(value, dict):
+            convert_json_value(value)
+        elif isinstance(value, str):
+            if value.lower() == "true":
+                json_obj[key] = True
+            elif value.lower()=="false":
+                json_obj[key] = False
+            elif value.isdigit() : 
+                json_obj[key] = convert_to_number(value)
+    return json_obj

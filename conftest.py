@@ -8,11 +8,13 @@ from playwright.async_api import async_playwright
 import asyncio
 from settings import *
 import helper.micellenuous as micel
+
 import csv 
 import pathlib, os
 from appium import webdriver
 from helper.driver import DriverFactory, Driver
 
+import re
 
 # pytest hook to capture the screenshot after each step
 @pytest.hookimpl(tryfirst=True)
@@ -236,12 +238,21 @@ def idriver (request, page, samplefixture, pytestconfig):
         yield samplefixture
     
     # driver.close()
-        
+
+
+
 @pytest.fixture()
 def context(playwright, config_data):
-    
-    browser = playwright[config_data['browser']].launch(headless=False)
+    micel.convert_json_value(config_data)
+
+    browser = playwright[config_data['browser']].launch(**config_data['launch_args']) # tested and run with chromium, but not firefox. 
     context = browser.new_context(**config_data['context_args'])
+
+    # browser = playwright[config_data['browser']].launch(headless=False,
+    #                                                     args= ["--start-maximized"],
+    #                                                     devtools = True)
+    # context = browser.new_context(no_viewport = True,
+    #                               record_video_dir=VIDEO_FOLDER)
 
     # context = playwright.chromium.launch(headless=False).new_context(
     #     record_video_dir=VIDEO_FOLDER,
