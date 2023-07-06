@@ -5,3 +5,5 @@
 /traces
 /test-results
 /__pycache__
+/allure-bdd
+/allure-unit

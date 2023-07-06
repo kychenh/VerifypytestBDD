@@ -47,6 +47,7 @@ def intercept_requestfinish(request):
    
 #     print(f"iiid = {myjson}")
 
+@allure.description("access google homepage!")
 def test_google(idriver): 
     idriver.goto("http://www.google.com")   
     print(idriver)

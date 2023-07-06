@@ -1,3 +1,4 @@
+allure-pytest==2.13.2
 allure-pytest-bdd==2.13.2
 allure-python-commons==2.13.2
 Appium-Python-Client==2.11.1

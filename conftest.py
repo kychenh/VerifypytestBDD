@@ -275,3 +275,28 @@ def page(context):
     
 #     yield page.browser
 #     # page.browser.close()
+
+
+
+def pytest_runtest_makereport(item, call):
+    report = item.reportinfo() 
+    # sample data :  (WindowsPath('C:/Mydata/Automation/VerifypytestBDD/unittest/test_withoutfeature.py'), 49, 'test_google')
+
+    # # try to get the function name, then use it to read every line of code.
+    # # todo : 
+    # when run below code it return this error. 
+    # ModuleNotFoundError: No module named 'C:\\Mydata\\Automation\\VerifypytestBDD\\unittest\\test_withoutfeature' 
+    # print(f"pytest_runtest_makereport calling {report}")
+    # module_name = str(report[0]) + ".py"
+    # module = importlib.import_module(module_name)
+ 
+    # func = getattr(module, report[2])  # 
+    # print(f"Function called for test : {read_function_lines(func)}")
+
+    # # module_path = Path("C:\\Mydata\\Automation\\VerifypytestBDD\\unittest\\test_withoutfeature.py")
+    # # module_name = module_path.stem
+    # # func_name = 'test_google'
+    # # spec = importlib.util.spec_from_file_location(module_name, module_path)
+    # # module = importlib.util.module_from_spec(spec)
+    # # spec.loader.exec_module(module)
+    

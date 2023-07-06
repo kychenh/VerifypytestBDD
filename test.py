@@ -1,53 +1,39 @@
-import re 
+import inspect
 
-def expand_string(reg_exp, func_name):
-    def expanded_string(string):
-        if re.match(reg_exp, string):
-            return func_name
-        else:
-            return None
-    
-    return expanded_string
+def read_function_lines(func):
+    """
+    inspect every line of code in function 'func' 
+    then print it out. 
+    """
+    source_lines, _ = inspect.getsourcelines(func)
+    for line in source_lines:
+        print(line.strip())
 
-def hello():
+# Example function
+def example_function():
+    # Code to be read
     print("Hello, world!")
+    result = 2 + 2
+    return result
 
-def goodbye():
-    print("Goodbye, world!")
+import importlib.util
+from pathlib import Path
 
-dictionary_scheme = {
-    r"he.*o": "hello",
-    r"g.*dbye": "goodbye"
-}
+module_path = Path("C:\\Mydata\\Automation\\VerifypytestBDD\\unittest\\test_withoutfeature.py")
+module_name = module_path.stem
+func_name = 'test_google'
+spec = importlib.util.spec_from_file_location(module_name, module_path)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
 
-LOCATOR = {
-    "LOGINFORM" : ".login-form",
-    "email" : lambda x : LOCATOR["LOGINFORM"], 
-    "password" : 'password',
-    "usreprofile" : '.header-topbar .user-dropdown',
-    "err_msg" : ".error"
-}
 
-print(f'emil = {LOCATOR["email"]("sfdsf")}')
+    
+#     # Import the module dynamically
+# module = importlib.import_module("C:\\Mydata\\Automation\\VerifypytestBDD\\unittest\\test_withoutfeature")
+# func_name = 'test_google'
+# # Get the function by its name
+# function = getattr(module, func_name)
 
-# for key, value in dictionary_scheme.items():
-#     expanded = expand_string(key, value)
-#     if expanded : 
-#         globals()[expanded("hello")]()
-#         break
-    # expanded("hello")
 
-# def my_function():
-#     print("Hello, World!")
-
-# # Assign the function name to a string
-# function_name = "my_function"
-
-# # Call the function using eval()
-# eval(function_name + "()")  # Output: "Hello, World!"
-
-# # Call the function using globals()
-# globals()[function_name]()  # Output: "Hello, World!"
-
-# # Call the function using locals()
-# locals()[function_name]()  # Output: "Hello, World!"
+func = getattr(module, func_name)
+read_function_lines(func)

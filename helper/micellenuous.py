@@ -9,6 +9,7 @@ import faker
 import csv
 import re
 import sys
+import inspect
 from jsondiff import diff
 from typing import List, Tuple
 from dateutil.parser import parse
@@ -433,3 +434,15 @@ def convert_json_value(json_obj):
             elif value.isdigit() : 
                 json_obj[key] = convert_to_number(value)
     return json_obj
+
+
+
+
+def read_function_lines(func):
+    """
+    inspect every line of code in function 'func' 
+    then print it out. 
+    """
+    source_lines, _ = inspect.getsourcelines(func)
+    for line in source_lines:
+        print(line.strip())

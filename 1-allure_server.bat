@@ -1,3 +1,3 @@
 cd %~dp0
-allure serve "./allure"
+allure serve "./allure-bdd" "allure-unit"
 pause

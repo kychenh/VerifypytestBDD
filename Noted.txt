@@ -47,6 +47,12 @@ cmd
 	
 	pytest -v -m runthis testcases
 
+	*** run	with bdd scenario. 
+	pipenv run pytest -m "login" -p allure_pytest_bdd --alluredir=allure-bdd
+
+	*** run for unit test in unittest folder. 
+	pipenv run pytest unittest/  -p allure_pytest --alluredir=allure-unit
+
 Debug : 
 	add -s when call pytest
 	example : pytest -s 
@@ -69,4 +75,7 @@ built in argument :
 	the name "caseid", "selected" is reverse for only. DONT DUPLICATE THIS NAME. 
 	under the hood, the framework will find this case existing in the item.name
 
+================
+Feature description : 
+- combine using bdd and unit test in one project: call for each command line separating then the allure will combine those ouput into one report. 
 
