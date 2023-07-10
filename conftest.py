@@ -1,6 +1,8 @@
 # conftest.py
 
+from allure_commons.utils import md5
 import json
+from uuid import UUID
 import pytest, allure, re
 from playwright.sync_api import (Page, BrowserContext, sync_playwright)
 from playwright._impl._api_types import Error as pwError
@@ -15,6 +17,10 @@ from appium import webdriver
 from helper.driver import DriverFactory, Driver
 
 import re
+
+from allure_commons.lifecycle import AllureLifecycle
+from allure_commons.model2 import Parameter
+
 
 # pytest hook to capture the screenshot after each step
 @pytest.hookimpl(tryfirst=True)
@@ -39,12 +45,24 @@ def pytest_bdd_after_step(request, feature, scenario, step, step_func, step_func
     # Attach the screenshot to the allure report
     allure.attach.file(screenshot_path, name="Screenshot", attachment_type=allure.attachment_type.PNG)
 
+def get_uuid(*args):
+    return str(UUID(md5(*args)))
 
 @pytest.hookimpl(tryfirst=True)
 # Register the pytest hooks
 def pytest_bdd_before_scenario(request, feature, scenario):
     trace_name = TRACE_TMP_FILENAME
-    context = request.getfixturevalue('context')
+    uuid = get_uuid(request.node.nodeid)
+    # full_name = get_full_name(feature, scenario)
+    # name = get_name(request.node, scenario)
+    with AllureLifecycle().schedule_test_case(uuid=uuid) as test_result:
+        test_result.parameters = [Parameter(name="name", value="value")]
+
+    # finalizer = partial(self._scenario_finalizer, scenario)
+    # request.node.addfinalizer(finalizer)
+
+    # context = request.getfixturevalue('context')
+
     # browser = request.getfixturevalue('browser')
     # playwright = request.getfixturevalue('playwright')
     # page = request.getfixturevalue('page')
@@ -53,11 +71,12 @@ def pytest_bdd_before_scenario(request, feature, scenario):
     # context = browser.new_context(
     #     **iphone_13,
     # )
-    context.tracing.start(screenshots=True, snapshots=True)
+    # context.tracing.start(screenshots=True, snapshots=True)
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_bdd_after_scenario(request, feature, scenario):
+    
     context = request.getfixturevalue('context')
     page = request.getfixturevalue('page')
     # page = request.getfixturevalue('idriver')
@@ -70,6 +89,7 @@ def pytest_bdd_after_scenario(request, feature, scenario):
     # move this file to new dir and rename.
     os.rename(trace_filepath, zip_new_name)
     allure.attach.file(source=zip_new_name, name="Scenario Trace Zip file")
+    allure.dynamic().parameter("added param", "customerize value",None,allure.parameter_mode.DEFAULT)
     
     # Attach the video to the allure report
     # allure.attach.video(path=VIDEO_FOLDER)
@@ -139,6 +159,7 @@ def pytest_addoption(parser):
     parser.addoption("--filter", action="store", default=None , help="filter out by provided regular expression")
     parser.addoption("--testcasefile", action="store",default=None , help="use this test case list to determine which case is run, \n csv file format with 2 col ( testcase name, yes/no)")
     parser.addoption("--driver", action="store", default="web" , help="[web, app]")
+    parser.addoption("--browser-config-file", action="store", default=None , help="specific the name of config file, which contain the browser configuration.")
 
 
 
@@ -163,8 +184,8 @@ def pytest_collection_modifyitems(config, items):
             writer = csv.writer(csvfile)
             for item in items:
                 print(item.name)
-                # item.fixturenames.append('my_param')
-                # item.add_marker(pytest.mark.parametrize('my_param', ['web']))  # add parameter to each test case. 
+                # item.fixturenames.append('context')
+                # item.add_marker(pytest.mark.parametrize('context', ['webkit']))  # add parameter to each test case. 
                 writer.writerow([item.name, item.location, item.parent, item.path, item.config] + item.user_properties )
     
     result = [item for item in items]
@@ -209,8 +230,18 @@ def pytest_collection_modifyitems(config, items):
     items[:] = result
 
 @pytest.fixture(autouse=True)
-def config_data():
-    with open(CONFIGDATA) as f:
+def start_tracing(context):
+    context.tracing.start(screenshots=True, snapshots=True)
+
+@pytest.fixture(autouse=True)
+def config_data(pytestconfig):
+
+    configfile= ""
+    if pytestconfig.getoption("--browser-config-file") and pytestconfig.getoption("--browser-config-file") != "": 
+        configfile = pytestconfig.getoption("--browser-config-file")
+    else: 
+        configfile = CONFIGDATA
+    with open(configfile) as f:
         config = json.load(f)
     return config
 
@@ -226,7 +257,7 @@ def samplefixture():
 # @pytest.fixture(params=['appp'])
 @pytest.fixture()
 def idriver (request, page, samplefixture, pytestconfig): 
-    # print for debug purpose only. List out all possible fixtures. 
+    # # print for debug purpose only. List out all possible fixtures. 
     # print(f"-------------------REQUEST OBJECT IN iDRIVER--------------")
     # for attr in dir(request):
     #     print(f"{attr} = {getattr(request, attr)}")
@@ -239,15 +270,24 @@ def idriver (request, page, samplefixture, pytestconfig):
     
     # driver.close()
 
-
-
-@pytest.fixture()
-def context(playwright, config_data):
+@pytest.fixture(params=['firefox','webkit'])
+def browser(playwright, config_data):
     micel.convert_json_value(config_data)
-
     browser = playwright[config_data['browser']].launch(**config_data['launch_args']) # tested and run with chromium, but not firefox. 
-    context = browser.new_context(**config_data['context_args'])
+    return browser
 
+# @pytest.fixture(params=['firefox','webkit'])
+@pytest.fixture()
+def context(playwright, config_data, request, browser):
+    # print(f"-------------------REQUEST OBJECT IN iDRIVER--------------")
+    # for attr in dir(request):
+    #     print(f"{attr} = {getattr(request, attr)}")
+
+    # micel.convert_json_value(config_data)
+    # browser = playwright[request.param].launch(**config_data['launch_args']) # tested and run with chromium, but not firefox. 
+    # browser = playwright[config_data['browser']].launch(**config_data['launch_args']) # tested and run with chromium, but not firefox. 
+    context = browser.new_context(**config_data['context_args'])
+    # context.tracing.start(screenshots=True, snapshots=True)
     # browser = playwright[config_data['browser']].launch(headless=False,
     #                                                     args= ["--start-maximized"],
     #                                                     devtools = True)
@@ -258,14 +298,14 @@ def context(playwright, config_data):
     #     record_video_dir=VIDEO_FOLDER,
         
     # )
-    yield context
-    # context.close()
+    yield context        
+    context.close()
 
 @pytest.fixture()
 def page(context):
     page = context.new_page()    
     yield page
-    # page.close()
+    page.close()
 
 # @pytest.fixture()
 # def page(playwright):    

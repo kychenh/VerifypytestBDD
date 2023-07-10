@@ -1,8 +1,7 @@
 runable
 to do : 
 - write function to 
-- [] automatically start video and start tracing in conftest file. 
--[] automatically  attach the video at the last step after end one scenario. 
+
 
 resource : 
 using pipenv : 
@@ -49,9 +48,10 @@ cmd
 
 	*** run	with bdd scenario. 
 	pipenv run pytest -m "login" -p allure_pytest_bdd --alluredir=allure-bdd
+	pipenv run pytest -m "login" -p allure_pytest_bdd --browser-config-file="configs/firefox.json" --alluredir=allure-bdd --output-tests-csv="example.csv"
 
 	*** run for unit test in unittest folder. 
-	pipenv run pytest unittest/  -p allure_pytest --alluredir=allure-unit
+	pipenv run pytest unittest/  -p allure_pytest --browser-config-file="configs/firefox.json" --alluredir=allure-unit 
 
 Debug : 
 	add -s when call pytest
@@ -78,4 +78,5 @@ built in argument :
 ================
 Feature description : 
 - combine using bdd and unit test in one project: call for each command line separating then the allure will combine those ouput into one report. 
-
+- [] automatically start video and start tracing in conftest file. 
+- [] automatically  attach the video at the last step after end one scenario. 

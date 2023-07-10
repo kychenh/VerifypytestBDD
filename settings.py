@@ -20,7 +20,7 @@ REMOTE_DIRSEP = "/"
 LOCAL_DIRSEP = "\\"
 LOG_FOLDER = join(BASEDIR, "logs")
 DBCONFIG_FILE = join(BASEDIR,"DBconfig.ini")
-CONFIGDATA = join(BASEDIR, "browser_args.json")
+CONFIGDATA = join(BASEDIR, "configs/browser_args.json")
 
 # get screensize 
 resolution = micel.get_monitor_resolution()

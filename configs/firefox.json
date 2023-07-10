@@ -1,0 +1,13 @@
+{
+    "browser" : "firefox",
+    "context_args" : {
+        "record_video_dir" : "./videos",
+        "no_viewport": "True"
+    }, 
+    "launch_args":{
+        "args": ["--start-maximized"],
+        "headless":"False",
+        "devtools" : "False"
+    },
+    "page_args" : ""
+}
