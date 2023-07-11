@@ -270,10 +270,10 @@ def idriver (request, page, samplefixture, pytestconfig):
     
     # driver.close()
 
-@pytest.fixture(params=['firefox','webkit'])
-def browser(playwright, config_data):
+@pytest.fixture(params=['firefox','chromium'])
+def browser(playwright, config_data, request):
     micel.convert_json_value(config_data)
-    browser = playwright[config_data['browser']].launch(**config_data['launch_args']) # tested and run with chromium, but not firefox. 
+    browser = playwright[request.param].launch(**config_data['launch_args']) # tested and run with chromium, but not firefox. 
     return browser
 
 # @pytest.fixture(params=['firefox','webkit'])
